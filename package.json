@@ -1,0 +1,23 @@
+{
+  "name": "group",
+  "version": "1.0.0",
+  "description": "simple group",
+  "keywords": [
+    "group"
+  ],
+  "homepage": "https://github.com/Reptar-IT/group#readme",
+  "bugs": {
+    "url": "https://github.com/Reptar-IT/group/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Reptar-IT/group.git"
+  },
+  "license": "ISC",
+  "author": "Reco Daley",
+  "type": "typescript",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
