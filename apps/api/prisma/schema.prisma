@@ -1,0 +1,152 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+// =================== GENERATOR ===================
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+// =================== DATASOURCE ===================
+datasource db {
+  provider = "postgresql"
+}
+
+// =================================================
+// =================== USERS =======================
+// =================================================
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  role      String?
+
+  orders    Order[]
+}
+
+// =================================================
+// =================== FEEDS =======================
+// =================================================
+model FeedProduct {
+  id          Int      @id @default(autoincrement())
+  name        String
+  batchNumber String
+  expiryDate  DateTime
+  stockQty    Int
+  price       Float
+  unit         String
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// =================================================
+// ================= FERTILIZER ====================
+// =================================================
+model FertilizerProduct {
+  id           Int      @id @default(autoincrement())
+  name         String
+  composition  Json     // NPK, trace elements
+  regulationId String?
+  stockQty     Int
+  price        Float
+  unit         String
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// =================================================
+// ==================== SOLAR ======================
+// =================================================
+
+// Customer intent + site info
+model SolarSurvey {
+  id             Int      @id @default(autoincrement())
+  customerName   String
+  email          String
+  location       String
+  siteAreaSqM    Float?
+  avgMonthlyKWh  Float?
+  roofType       String // concrete, tiles, asphalt tiles 
+
+  status         String   // new, surveyed, quoted, approved, rejected
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  proposals      SolarProposal[]
+}
+
+// System-generated solution & pricing
+model SolarProposal {
+  id             Int      @id @default(autoincrement())
+  surveyId       Int
+
+  systemSizeKW   Float
+  panelCount     Int
+  inverterType   String
+  inverterCount  Int
+  batteryCount   Int
+  estimatedCost  Float
+  notes          String?
+
+  status         String   // draft, sent, approved, rejected
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  survey         SolarSurvey @relation(fields: [surveyId], references: [id])
+  project        SolarProject?
+}
+
+// Execution & installation phase
+model SolarProject {
+  id               Int      @id @default(autoincrement())
+  proposalId       Int      @unique
+
+  startDate        DateTime?
+  completionDate   DateTime?
+  status           String   // scheduled, installing, completed
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  proposal         SolarProposal @relation(fields: [proposalId], references: [id])
+}
+
+// =================================================
+// ================== ORDERS =======================
+// =================================================
+// Used ONLY for checkout-capable domains (feeds, fertilizer)
+model Order {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  domain    String   // feed | fertilizer
+  domainRef Int      // productId
+  quantity  Int
+  total     Float
+  status    String   // pending, paid, fulfilled
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+// =================================================
+// ================= INQUIRIES =====================
+// =================================================
+// Used for quote-based or info-based domains
+model Inquiry {
+  id        Int      @id @default(autoincrement())
+  email     String
+  message   String
+  domain    String   // solar | webdev | fertilizer
+  domainRef Int?
+
+  createdAt DateTime @default(now())
+}

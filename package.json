@@ -9,7 +9,8 @@
   ],
   "scripts": {
     "dev": "npm run dev --workspaces",
-    "build": "npm run build --workspaces"
+    "build": "npm run build --workspaces",
+    "test": "build docker compose up -d --build"
   },
   "repository": {
     "type": "git",

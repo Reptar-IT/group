@@ -5,10 +5,16 @@ import { defineConfig } from "prisma/config";
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
+
+  // Datasource URL is required for migrate dev
+  datasource: {
+    url: process.env.DATABASE_URL!, // ← MUST be here for migrations
+    provider: "postgresql",
+  },
+
   migrations: {
     path: "prisma/migrations",
-  },
-  datasource: {
-    url: process.env["DATABASE_URL"],
+    provider: "postgresql",
   },
 });
+
