@@ -30,6 +30,24 @@ services:
     networks:
       - group-network
 
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: group_api
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "3001:3001"
+    depends_on:
+      - postgres
+    volumes:
+      - ./apps/api:/app
+    command: sh -c "npx prisma migrate dev && npm run dev"
+    networks:
+      - group-network
+
 volumes:
   pgdata:
 
